@@ -15,12 +15,8 @@ int main(int argc, string argv[])
   numberClusters = atoi(argv[1]);
   createClusters();
   kMeans();  
-  tabuSearch(20,1000,20); 
+  tabuSearch(100,1000,20); 
 
-  // int a[4] = { 1,2,3,4};
-  // int *b = a + 1;
-
-  // printf("%d\n",b[1]);
   free(mapCityCluster);
   free(cities);
   free(clusters);

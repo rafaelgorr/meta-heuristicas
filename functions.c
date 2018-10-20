@@ -207,13 +207,10 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
       if (i != 0)
       {        
         for(int j = 0;j<neighborArrayLen(numberCitiesInCluster);j++)
-          findNearestCity(neighbors[j].neighbor, numberCitiesInCluster, lastCityOfCluster);
-        firstCityOfCluster = bestNeighbor.neighbor[0];
+          findNearestCity(neighbors[j].neighbor, numberCitiesInCluster, lastCityOfCluster);        
       }
       
-      // printArray(bestNeighbor.neighbor, numberCitiesInCluster);
       bestNeighborValue.value = __INT_MAX__;
-      // bestNeighborValue.id = -1;
       for (int j = 0; j < neighborArrayLen(numberCitiesInCluster); j++) //SEARCH FOR THE BEST NEIGHBOR
       {
         if (!checkIfMovIsTabu(tabuList, tabuListCount, neighbors[j].m)) //CHECK IF MOVIMENT m ISN'T TABU
@@ -233,10 +230,8 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
             bestNeighborValue.id = j;
           }
         }
-      }
+      }      
       
-      // if (bestNeighborValue.id == -1)
-      //   continue;
       free(bestNeighbor.neighbor);
       bestNeighbor.neighbor = copyArray(neighbors[bestNeighborValue.id].neighbor, // FIND BEST LOCAL NEIGHBOR
                                         neighbors[bestNeighborValue.id].len);
@@ -256,7 +251,7 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
     }
     if (i != 0)
     {
-      // firstCityOfCluster = best.neighbor[0];
+      firstCityOfCluster = best.neighbor[0];
       totalPathValue += euclDist(cities[lastCityOfCluster].c,
                                  cities[firstCityOfCluster].c);
     }
@@ -426,7 +421,7 @@ void findNearestCity(int *cts, int len, int idCity)
 {  
   for (int i = 0; i < len; i++)
     if (euclDist(cities[idCity].c, cities[cts[0]].c) > euclDist(cities[idCity].c, cities[cts[i]].c))
-      swap(cts + 1, cts);
+      swap(cts + i, cts);
 }
 
 /*********************************************/
