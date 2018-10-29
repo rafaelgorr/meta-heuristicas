@@ -17,7 +17,7 @@ int             getCentroidX                (int clusterId);
 int             getCentroidY                (int clusterId);
 
 /*********** TABU SEARCH FUNCTIONS ***********/
-void            tabuSearch                  (int tabuListSize, int maxIter, int maxIterImpr);
+void            tabuSearch                  (int tabuListSize, int maxIter);
 int             getPathValue                (int *visitedCities, int len);
 int             getNumberCitiesInCluster    (int clusterId);
 Neighbor*       getNeighbors                (int *bestNeighbor, int len );
@@ -34,5 +34,7 @@ int             neighborArrayLen            (int len);
 void            permute                     (int* array,int len, int l);
 void            swap                        (int* x, int* y);
 void            findNearestCity             (int* cts, int len, int idCity);
+void            sortClusters                ();
+int             fatorial                    (int a);
 
 #endif 

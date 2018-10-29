@@ -3,7 +3,7 @@
 /*************** READ FUNCTIONS ***************/
 void readCities()
 {
-  string str = (string)malloc(sizeof(char) * 9999999);
+  string str = (string)malloc(sizeof(char) * 99999999);
   float x, y;
   int id;
 
@@ -27,15 +27,7 @@ void readCities()
     sscanf(line, "%d %f %f\n", &id, &x, &y);
     cities[i].id = id - 1;
     cities[i].c.x = round(x);
-    cities[i].c.y = round(y);
-
-    if (cities[i].c.x > greatestX)
-      greatestX = cities[i].c.x;
-
-    if (cities[i].c.y > greatestY)
-      greatestY = cities[i].c.y;
-
-    // printf("(%d,%d)\n",cities[i].c.x,cities[i].c.y);
+    cities[i].c.y = round(y);    
     line = strtok(NULL, "\n");
   }
 }
@@ -45,28 +37,38 @@ void readCities()
 void createClusters()
 {
   srand(time(NULL));
-  clusters = (Cluster *)calloc(numberClusters, sizeof(Cluster));
-  int addPosX = greatestX / numberClusters;
-  int addPosY = greatestY / numberClusters;
-  int posX = 0;
-  int posY = 0;
+  int *visitedCities = (int *)calloc(numberCities, sizeof(int));
+  int randCity;
+  clusters = (Cluster *)calloc(numberClusters, sizeof(Cluster)); 
   for (int i = 0; i < numberClusters; i++)
   {
-    posX += addPosX;
-    posY += addPosY;
-    clusters[i].id = i;
-    clusters[i].c.x = posX;
-    clusters[i].c.y = posY;
-  }
+    while (1)
+    {
+      randCity = rand() % numberCities;
+      if (visitedCities[randCity] == 0)
+      {
+        visitedCities[randCity] = 1;
+        break;
+      }
+    }   
+
+    clusters[i].id = cities[randCity].id;
+    clusters[i].c.x = cities[randCity].c.x;
+    clusters[i].c.y = cities[randCity].c.y;
+  } 
+
+  sortClusters(); 
+  mapCityCluster = (int *)calloc(numberCities, sizeof(int));
+  getSmallerDist(numberClusters);  
 }
 
 void kMeans()
 {
-  mapCityCluster = (int *)calloc(numberCities, sizeof(int));
-  int maxIter = 50;
+  mapCityCluster = (int *)calloc(numberCities, sizeof(int));  
+  int maxIter = 1;
   for (int it = 0; it < maxIter; it++)
   {
-    getSmallerDist(numberClusters);
+    getSmallerDist(numberClusters); 
     updateCentroids(numberClusters);
   }
 }
@@ -141,7 +143,7 @@ int getCentroidY(int clusterId)
 /*********************************************/
 
 /*********** TABU SEARCH FUNCTIONS ***********/
-void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
+void tabuSearch(int tabuListSize, int maxIter)
 {
   int *citiesInCluster = NULL;
   int numberCitiesInCluster;
@@ -168,13 +170,12 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
   for (int i = 0; i < numberClusters; i++)
   {
     numberCitiesInCluster = getNumberCitiesInCluster(clusters[i].id);
-    if (numberCitiesInCluster == 0 || numberCitiesInCluster == 1)
-      continue;
-    // printf("CLUSTER %d: %d\n", i, numberCitiesInCluster);
+    // printf("CLUSTER %d: %d\n", clusters[i].id, numberCitiesInCluster);
 
     if (citiesInCluster != NULL)
       free(citiesInCluster);
     citiesInCluster = (int *)calloc(numberCitiesInCluster, sizeof(int));
+
     visitedCount = 0;
     for (int j = 0; j < numberCities; j++)
       if (mapCityCluster[j] == clusters[i].id)
@@ -182,6 +183,13 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
         citiesInCluster[visitedCount] = cities[j].id;
         visitedCount++;
       }
+    if (numberCitiesInCluster == 1)
+    {      
+      totalPathValue += euclDist(cities[lastCityOfCluster].c,
+                                 cities[citiesInCluster[0]].c);
+      lastCityOfCluster = cities[citiesInCluster[0]].id;
+      continue;
+    }
     if (best.neighbor != NULL)
       free(best.neighbor);
 
@@ -203,13 +211,13 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
       if (neighbors != NULL)
         free(neighbors);
 
-      neighbors = getNeighbors(bestNeighbor.neighbor, numberCitiesInCluster); // CREATE NEIGHBORS      
+      neighbors = getNeighbors(bestNeighbor.neighbor, numberCitiesInCluster); // CREATE NEIGHBORS
       if (i != 0)
-      {        
-        for(int j = 0;j<neighborArrayLen(numberCitiesInCluster);j++)
-          findNearestCity(neighbors[j].neighbor, numberCitiesInCluster, lastCityOfCluster);        
+      {
+        for (int j = 0; j < neighborArrayLen(numberCitiesInCluster); j++)
+          findNearestCity(neighbors[j].neighbor, numberCitiesInCluster, lastCityOfCluster);
       }
-      
+
       bestNeighborValue.value = __INT_MAX__;
       for (int j = 0; j < neighborArrayLen(numberCitiesInCluster); j++) //SEARCH FOR THE BEST NEIGHBOR
       {
@@ -230,8 +238,8 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
             bestNeighborValue.id = j;
           }
         }
-      }      
-      
+      }
+
       free(bestNeighbor.neighbor);
       bestNeighbor.neighbor = copyArray(neighbors[bestNeighborValue.id].neighbor, // FIND BEST LOCAL NEIGHBOR
                                         neighbors[bestNeighborValue.id].len);
@@ -255,7 +263,6 @@ void tabuSearch(int tabuListSize, int maxIter, int maxIterImpr)
       totalPathValue += euclDist(cities[lastCityOfCluster].c,
                                  cities[firstCityOfCluster].c);
     }
-
     totalPathValue += getPathValue(best.neighbor, numberCitiesInCluster);
     lastCityOfCluster = best.neighbor[numberCitiesInCluster - 1];
   }
@@ -284,12 +291,14 @@ int getNumberCitiesInCluster(int clusterId)
 
 Neighbor *getNeighbors(int *bestNeighbor, int len)
 {
-  Neighbor *neighbors = (Neighbor *)calloc(neighborArrayLen(len), sizeof(Neighbor));
+  Neighbor *neighbors = (Neighbor *)calloc((len) * (len), sizeof(Neighbor));
   int neighborCount = 0;
   int aux;
-  for (int i = 0; i < len - 1; i++)
-    for (int j = i + 1; j < len; j++)
+  for (int i = 0; i < len; i++)
+    for (int j = 0; j < len; j++)
     {
+      if (i == j)
+        continue;
       neighbors[neighborCount].len = len;
       neighbors[neighborCount].neighbor = copyArray(bestNeighbor, len);
       aux = neighbors[neighborCount].neighbor[j];
@@ -299,18 +308,6 @@ Neighbor *getNeighbors(int *bestNeighbor, int len)
       neighbors[neighborCount].m.j = j;
       neighborCount++;
     }
-
-  // for (int i = 0; i < len - 1; i++)
-  // {
-  //   neighbors[i].len = len;
-  //   neighbors[i].neighbor = copyArray(bestNeighbor, len);
-  //   aux = neighbors[i].neighbor[i + 1];
-  //   neighbors[i].neighbor[i + 1] = neighbors[i].neighbor[i];
-  //   neighbors[i].neighbor[i] = aux;
-  //   neighbors[i].m.i = i;
-  //   neighbors[i].m.j = i + 1;
-  // }
-
   return neighbors;
 }
 
@@ -418,10 +415,39 @@ void permute(int *a, int len, int l)
 }
 
 void findNearestCity(int *cts, int len, int idCity)
-{  
+{
   for (int i = 0; i < len; i++)
     if (euclDist(cities[idCity].c, cities[cts[0]].c) > euclDist(cities[idCity].c, cities[cts[i]].c))
       swap(cts + i, cts);
+}
+
+void sortClusters()
+{
+  int lowerDist, lowerPos;
+  Cluster aux;
+  for (int i = 0; i < numberClusters - 1; i++)
+  {
+    lowerDist = __INT_MAX__;
+    for (int j = i + 1; j < numberClusters; j++)
+    {
+      if (lowerDist > euclDist(clusters[i].c, clusters[j].c))
+      {
+        lowerDist = euclDist(clusters[i].c, clusters[j].c);
+        lowerPos = j;
+      }
+    }
+    aux = clusters[i + 1];
+    clusters[i + 1] = clusters[lowerPos];
+    clusters[lowerPos] = aux;
+  }
+}
+int fatorial(int a)
+{
+
+  if (a <= 1)
+    return 1;
+  else
+    return a * fatorial(a - 1);
 }
 
 /*********************************************/

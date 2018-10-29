@@ -10,12 +10,11 @@ int main(int argc, string argv[])
   {
     printf("ERROR: INVALID NUMBER OF ARGUMENTS\nEXPECTED %d\nOBTAINED: %d\n",minArgs,argc);    
     exit(1);
-  }
+  }  
   readCities();
   numberClusters = atoi(argv[1]);
   createClusters();
-  kMeans();  
-  tabuSearch(100,1000,20); 
+  tabuSearch(1000,2000); 
 
   free(mapCityCluster);
   free(cities);
