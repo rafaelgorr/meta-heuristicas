@@ -19,7 +19,5 @@ int main(int argc, string argv[])
   free(mapCityCluster);
   free(cities);
   free(clusters);
-
-
   return EXIT_SUCCESS;
 }
