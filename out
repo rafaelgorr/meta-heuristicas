@@ -1,1 +1,20 @@
-TOTAL: 12610
+./main 132 < inputs/132d657.tsp
+71343
+./main 132 < inputs/132d657.tsp
+70478
+./main 132 < inputs/132d657.tsp
+72667
+./main 132 < inputs/132d657.tsp
+69056
+./main 132 < inputs/132d657.tsp
+76687
+./main 132 < inputs/132d657.tsp
+71039
+./main 132 < inputs/132d657.tsp
+70759
+./main 132 < inputs/132d657.tsp
+69534
+./main 132 < inputs/132d657.tsp
+71270
+./main 132 < inputs/132d657.tsp
+67646
