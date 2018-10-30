@@ -13,6 +13,17 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) $(GCFLAGS) -o $@
 
 
+run:	
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
+	./main ${n} < ${input}
 
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)

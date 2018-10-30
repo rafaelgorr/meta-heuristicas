@@ -14,7 +14,7 @@ int main(int argc, string argv[])
   readCities();
   numberClusters = atoi(argv[1]);
   createClusters();
-  tabuSearch(1000,2000); 
+  tabuSearch(1000,1000); 
 
   free(mapCityCluster);
   free(cities);

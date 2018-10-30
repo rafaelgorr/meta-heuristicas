@@ -266,7 +266,7 @@ void tabuSearch(int tabuListSize, int maxIter)
     totalPathValue += getPathValue(best.neighbor, numberCitiesInCluster);
     lastCityOfCluster = best.neighbor[numberCitiesInCluster - 1];
   }
-  printf("TOTAL: %d\n", totalPathValue);
+  printf("%d\n", totalPathValue);
 }
 
 int getPathValue(int *visitedCities, int len)
